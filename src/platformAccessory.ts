@@ -4,7 +4,7 @@ import Denon from 'denon-client';
 
 export class DenonAccessory {
   private service!: Service;
-  private state = { mute: false };
+  private state = { on: false };
 
   constructor(
     private readonly platform: HomebridgeDenonAVR,
@@ -17,24 +17,19 @@ export class DenonAccessory {
       .setCharacteristic(this.platform.Characteristic.Model, 'AVR-X1000')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
 
-    this.service = this.accessory.getService(this.platform.Service.SmartSpeaker)
-      || this.accessory.addService(this.platform.Service.SmartSpeaker);
-    this.service.getCharacteristic(this.platform.Characteristic.CurrentMediaState)
-      .onGet(() => this.platform.Characteristic.CurrentMediaState.PLAY);
-    this.service.getCharacteristic(this.platform.Characteristic.TargetMediaState)
-      .onGet(() => this.platform.Characteristic.TargetMediaState.PLAY)
-      .onSet(() => '');
-    this.service.getCharacteristic(this.platform.Characteristic.Mute)
+    this.service = this.accessory.getService(this.platform.Service.Switch)
+      || this.accessory.addService(this.platform.Service.Switch);
+    this.service.getCharacteristic(this.platform.Characteristic.On)
       .onSet(async (value: CharacteristicValue) => {
-        this.state.mute = value.valueOf() as boolean;
-        await device.setPower(this.state.mute ? 'STANDBY' : 'ON');
+        this.state.on = value.valueOf() as boolean;
+        await device.setPower(this.state.on ? 'STANDBY' : 'ON');
       })
-      .onGet(() => this.state.mute);
+      .onGet(() => this.state.on);
 
     device.on('powerChanged', (data: 'STANDBY' | 'ON') => {
-      this.state.mute = data === 'STANDBY';
-      this.platform.log.info('Update mute', this.state.mute);
-      this.service.updateCharacteristic(this.platform.Characteristic.Mute, this.state.mute);
+      this.state.on = data === 'STANDBY';
+      this.platform.log.info('Update mute', this.state.on);
+      this.service.updateCharacteristic(this.platform.Characteristic.On, this.state.on);
     });
 
     device.connect();
