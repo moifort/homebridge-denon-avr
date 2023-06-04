@@ -17,9 +17,9 @@ export class DenonAccessory {
       .setCharacteristic(this.platform.Characteristic.Model, 'AVR-X1000')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, accessory.context.device.id);
 
-    this.service = this.accessory.getService(this.platform.Service.TelevisionSpeaker)
-      || this.accessory.addService(this.platform.Service.TelevisionSpeaker);
-    this.service.getCharacteristic(this.platform.Characteristic.Mute)
+    this.service = this.accessory.getService(this.platform.Service.Lightbulb)
+      || this.accessory.addService(this.platform.Service.Lightbulb);
+    this.service.getCharacteristic(this.platform.Characteristic.On)
       .onSet(async (value: CharacteristicValue) => {
         this.state.mute = value.valueOf() as boolean;
         await device.setPower(this.state.mute ? 'STANDBY' : 'ON');
@@ -29,7 +29,7 @@ export class DenonAccessory {
     device.on('powerChanged', (data: 'STANDBY' | 'ON') => {
       this.state.mute = data === 'STANDBY';
       this.platform.log.info('Update mute', this.state.mute);
-      this.service.updateCharacteristic(this.platform.Characteristic.Mute, this.state.mute);
+      this.service.updateCharacteristic(this.platform.Characteristic.On, this.state.mute);
     });
 
     device.connect();
