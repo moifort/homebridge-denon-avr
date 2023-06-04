@@ -22,8 +22,7 @@ export class DenonAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.On)
       .onSet(async (value: CharacteristicValue) => {
         this.state.on = value.valueOf() as boolean;
-        await device.setPower(this.state.on ? 'ON' : 'STANDBY');
-        await device.setInput('SAT/CBL');
+        device.setPower(this.state.on ? 'ON' : 'STANDBY').then(() => device.setInput('SAT/CBL'));
       })
       .onGet(() => this.state.on);
 
