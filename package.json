@@ -1,7 +1,7 @@
 {
   "private": false,
   "displayName": "Hombridge Denon AVR",
-  "name": "homebridge-denon-avr",
+  "name": "homebridge-denon-avr-1000",
   "version": "0.0.3",
   "description": "Free the full potential of your denon AVR with HomeKit and Homebridge",
   "license": "Apache-2.0",

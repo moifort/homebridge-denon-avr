@@ -6,4 +6,4 @@ export const PLATFORM_NAME = 'HomebridgeDenonAVR';
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-denon-avr';
+export const PLUGIN_NAME = 'homebridge-denon-avr-1000';
