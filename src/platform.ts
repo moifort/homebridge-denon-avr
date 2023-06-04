@@ -27,7 +27,7 @@ export class HomebridgeDenonAVR implements DynamicPlatformPlugin {
   }
 
   discoverDevices() {
-    const device = { id: '1', name: 'Denon', host: '192.168.0.137' };
+    const device = { id: '192.168.0.137', name: 'Denon', host: '192.168.0.137' };
     const uuid = this.api.hap.uuid.generate(device.id);
     const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
     if (existingAccessory) {
