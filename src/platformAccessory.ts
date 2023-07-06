@@ -1,6 +1,6 @@
 import {CharacteristicValue, PlatformAccessory, Service} from 'homebridge';
 import {HomebridgeDenonAVR} from './platform';
-import Denon from 'denon-client';
+import axios from 'axios/index';
 
 export class DenonAccessory {
   private service!: Service;
@@ -10,7 +10,7 @@ export class DenonAccessory {
     private readonly platform: HomebridgeDenonAVR,
     private readonly accessory: PlatformAccessory,
   ) {
-    const device = new Denon.DenonClient(accessory.context.device.host);
+    const http = axios.create({ baseURL: `http://${accessory.context.device.host}` });
 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Denon')
@@ -20,25 +20,20 @@ export class DenonAccessory {
     this.service = this.accessory.getService(this.platform.Service.Switch)
       || this.accessory.addService(this.platform.Service.Switch);
     this.service.getCharacteristic(this.platform.Characteristic.On)
-      .onSet(async (value: CharacteristicValue) => {
+      .onSet( (value: CharacteristicValue) => {
         this.state.on = value.valueOf() as boolean;
-        try {
-          await device.setPower(this.state.on ? 'ON' : 'STANDBY').then(() => device.setInput('SAT/CBL'));
-        } catch (e) {
-          this.platform.log.warn('Reconnect');
-          await device.connect();
-          await device.setPower(this.state.on ? 'ON' : 'STANDBY').then(() => device.setInput('SAT/CBL'));
+        if (this.state.on) {
+          http.get('/goform/formiPhoneAppDirect.xml?SISAT/CBL');
+        } else {
+          http.get('/goform/formiPhoneAppDirect.xml?PWSTANDBY');
         }
-
       })
       .onGet(() => this.state.on);
 
-    device.on('powerChanged', (data: 'STANDBY' | 'ON') => {
-      this.state.on = data === 'ON';
-      this.platform.log.info('Update mute', this.state.on);
-      this.service.updateCharacteristic(this.platform.Characteristic.On, this.state.on);
-    });
-
-    device.connect();
+    // device.on('powerChanged', (data: 'STANDBY' | 'ON') => {
+    //   this.state.on = data === 'ON';
+    //   this.platform.log.info('Update mute', this.state.on);
+    //   this.service.updateCharacteristic(this.platform.Characteristic.On, this.state.on);
+    // });
   }
 }
