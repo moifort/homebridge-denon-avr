@@ -1,6 +1,6 @@
 import {CharacteristicValue, PlatformAccessory, Service} from 'homebridge';
 import {HomebridgeDenonAVR} from './platform';
-import axios from 'axios/index';
+import axios from 'axios';
 
 export class DenonAccessory {
   private service!: Service;
